@@ -4,6 +4,8 @@
 // Electron参考文档 https://www.electronjs.org/docs
 const { app, BrowserWindow, nativeImage } = require("electron");
 const path = require("path");
+const Drawing = require("dxf-writer");
+const fs = require("fs");
 // const url = require('url');
 
 function createWindow() {
@@ -44,6 +46,21 @@ function createWindow() {
     // mainWindow.on("closed", () => {
     //     mainWindow = null;
     // });
+
+    let d = new Drawing();
+
+    d.setUnits("Decimeters");
+    d.drawText(10, 0, 10, 0, "Hello World"); // draw text in the default layer named "0"
+    d.addLayer("l_green", Drawing.ACI.GREEN, "CONTINUOUS");
+    d.setActiveLayer("l_green");
+    d.drawText(20, -70, 10, 0, "go green!");
+
+    //or fluent
+    d.addLayer("l_yellow", Drawing.ACI.YELLOW, "DOTTED")
+        .setActiveLayer("l_yellow")
+        .drawCircle(50, -30, 25);
+
+    fs.writeFileSync(__filename + ".dxf", d.toDxfString());
 
     // 在启动的时候打开DevTools
     mainWindow.webContents.openDevTools();
