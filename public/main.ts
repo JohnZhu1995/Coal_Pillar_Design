@@ -2,15 +2,13 @@
 // app 控制应用程序的事件生命周期。事件调用app.on('eventName', callback)，方法调用app.functionName(arg)
 // BrowserWindow 创建和控制浏览器窗口。new BrowserWindow([options]) 事件和方法调用同app
 // Electron参考文档 https://www.electronjs.org/docs
+const drawDXF = require("./drawDXF/index.ts");
 const { app, BrowserWindow, nativeImage } = require("electron");
 const path = require("path");
-const Drawing = require("dxf-writer");
-const fs = require("fs");
-// const url = require('url');
 
 function createWindow() {
     // Create the browser window.
-    const mainWindow = new BrowserWindow({
+    let mainWindow = new BrowserWindow({
         width: 800, // 窗口宽度
         height: 600, // 窗口高度
         // title: "Electron app", // 窗口标题,如果由loadURL()加载的HTML文件中含有标签<title>，该属性可忽略
@@ -30,10 +28,6 @@ function createWindow() {
     //   protocol: 'file:',
     //   slashes: true
     // }));
-
-    // 因为我们是加载的react生成的页面，并不是静态页面
-    // 所以loadFile换成loadURL。
-    // 加载应用 --开发阶段  需要运行 yarn start
     mainWindow.loadURL("http://localhost:3000");
 
     // 解决应用启动白屏问题
@@ -42,29 +36,14 @@ function createWindow() {
         mainWindow.focus();
     });
 
-    // 当窗口关闭时发出。在你收到这个事件后，你应该删除对窗口的引用，并避免再使用它。
-    // mainWindow.on("closed", () => {
-    //     mainWindow = null;
-    // });
+    // release storage when mainWindow is closed
+    mainWindow.on("closed", () => {
+        mainWindow = null;
+    });
 
-    console.log(111, __filename);
-    let d = new Drawing();
+    drawDXF();
 
-    d.setUnits("Decimeters");
-    d.drawText(10, 0, 10, 0, "Hello World"); // draw text in the default layer named "0"
-    d.addLayer("l_green", Drawing.ACI.GREEN, "CONTINUOUS");
-    d.setActiveLayer("l_green");
-    d.drawText(20, -70, 10, 0, "go green!");
-
-    //or fluent
-    d.addLayer("l_yellow", Drawing.ACI.YELLOW, "DOTTED")
-        .setActiveLayer("l_yellow")
-        .drawCircle(50, -30, 25);
-
-    fs.writeFileSync(__filename + ".dxf", d.toDxfString());
-    // drawDXF();
-
-    // 在启动的时候打开DevTools
+    // open DevTools when mainWindow is showed
     mainWindow.webContents.openDevTools();
 }
 
@@ -82,7 +61,6 @@ app.whenReady().then(() => {
 app.on("window-all-closed", function () {
     // On macOS it is common for applications and their menu bar
     // to stay active until the user quits explicitly with Cmd + Q
-    console.log("window-all-closed");
     if (process.platform !== "darwin") app.quit();
 });
 
@@ -94,20 +72,3 @@ app.on("activate", function () {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
-const drawDXF = () => {
-    console.log(111, __filename);
-    let d = new Drawing();
-
-    d.setUnits("Decimeters");
-    d.drawText(10, 0, 10, 0, "Hello World"); // draw text in the default layer named "0"
-    d.addLayer("l_green", Drawing.ACI.GREEN, "CONTINUOUS");
-    d.setActiveLayer("l_green");
-    d.drawText(20, -70, 10, 0, "go green!");
-
-    //or fluent
-    d.addLayer("l_yellow", Drawing.ACI.YELLOW, "DOTTED")
-        .setActiveLayer("l_yellow")
-        .drawCircle(50, -30, 25);
-
-    fs.writeFileSync(__filename + ".dxf", d.toDxfString());
-};
