@@ -1,0 +1,86 @@
+.dxf {
+    width: 100%;
+    display: flex;
+}
+
+.left-wrap {
+    height: 100vh;
+    background-color: #282c34;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.left-wrap .manual-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 85%;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 1);
+    border-radius: 10px;
+}
+
+.left-wrap .auto-panel {
+    width: 80%;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 1);
+    border-radius: 20px;
+}
+
+.left-wrap .header {
+    color: #61dbfb;
+    font-size: 33px;
+    height: 14vmin;
+}
+
+.right-wrap {
+    /* width: 70%; */
+    height: 100vh;
+}
+
+.css-xn6ruc > :not(style) {
+    margin: 8px 0 !important;
+    width: 100% !important;
+}
+
+.click-btn {
+    min-width: 90% !important;
+    margin: 8px !important;
+}
+
+.css-e363es-MuiFormControl-root {
+    min-width: 90% !important;
+}
+
+.css-zqcytf-MuiButtonGroup-root {
+    min-width: 90% !important;
+    margin: 8px !important;
+}
+
+.click-btn.manual-btn {
+    min-width: 80% !important;
+    margin-top: 30px !important;
+}
+
+.css-zqcytf-MuiButtonGroup-root .MuiButtonGroup-grouped:not(:last-of-type) {
+    width: 80%;
+}
+
+.css-zqcytf-MuiButtonGroup-root .MuiButtonGroup-grouped:not(:first-of-type) {
+    width: 20%;
+}
+
+.css-1unhvdk-MuiGrid2-root {
+    width: 100%;
+}
+
+#cad-view {
+    width: 100%;
+    height: 100%;
+}
+
+.css-1yk1gt9-MuiInputBase-root-MuiOutlinedInput-root-MuiSelect-root {
+    background-color: #fff;
+}

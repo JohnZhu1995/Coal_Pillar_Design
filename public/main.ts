@@ -11,8 +11,11 @@ function createWindow() {
     let mainWindow = new BrowserWindow({
         width: 800, // 窗口宽度
         height: 600, // 窗口高度
+        minWidth: 800, // 窗口宽度
+        minHeight: 600, // 窗口高度
         // title: "Electron app", // 窗口标题,如果由loadURL()加载的HTML文件中含有标签<title>，该属性可忽略
         icon: nativeImage.createFromPath("public/favicon.ico"), // "string" || nativeImage.createFromPath('public/favicon.ico')从位于 path 的文件创建新的 NativeImage 实例
+        // resizable: false,
         webPreferences: {
             // 网页功能设置
             webviewTag: true, // 是否使用<webview>标签 在一个独立的 frame 和进程里显示外部 web 内容
@@ -35,6 +38,9 @@ function createWindow() {
         mainWindow.show();
         mainWindow.focus();
     });
+
+    // 关闭顶部菜单
+    // mainWindow.setMenu(null);
 
     // release storage when mainWindow is closed
     mainWindow.on("closed", () => {
