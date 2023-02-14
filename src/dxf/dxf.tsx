@@ -4,10 +4,8 @@ import "./dxf.css";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 // import FormHelperText from "@mui/material/FormHelperText";
-import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import ButtonGroup from "@mui/material/ButtonGroup";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
@@ -18,6 +16,7 @@ import Popper from "@mui/material/Popper";
 import MenuList from "@mui/material/MenuList";
 import Grid from "@mui/material/Unstable_Grid2";
 // import ThreeDxf from "three-dxf";
+import DataModal from "./dataModal";
 
 // var parser = new window.DxfParser();
 // var dxf = parser.parseSync(fileReader.result);
@@ -30,21 +29,8 @@ import Grid from "@mui/material/Unstable_Grid2";
 
 const options = ["导出数据配置", "导出dxf"];
 
-function dxf() {
-    // const [cate, setAge] = React.useState("");
-    // const [protecto, setAge] = React.useState("");
-    const [exporto, setAge] = React.useState("");
-
-    const handleChangeCate = (event: SelectChangeEvent) => {
-        setAge(event.target.value);
-    };
-    const handleChangeProtect = (event: SelectChangeEvent) => {
-        setAge(event.target.value);
-    };
-    const handleChangeExport = (event: SelectChangeEvent) => {
-        setAge(event.target.value);
-    };
-
+export default function dxf() {
+    // ButtonGroup
     const [open, setOpen] = React.useState(false);
     const anchorRef = React.useRef<HTMLDivElement>(null);
     const [selectedIndex, setSelectedIndex] = React.useState(1);
@@ -76,54 +62,19 @@ function dxf() {
         setOpen(false);
     };
 
-    // const manualOpen = false;
+    // Modal
+    const [openModal, setOpenModal] = React.useState(false);
+    const handleOpenModal = () => setOpenModal(true);
+    const handleCloseModal = () => setOpenModal(false);
 
     return (
         <Box className="dxf">
             <Grid container spacing={0}>
-                <Grid xs={4} md={3} className="left-wrap">
+                <Grid md={3} lg={2} className="left-wrap">
                     {/* dxf-writer */}
                     <div className="header">保护煤柱留设</div>
 
                     <div className="auto-panel">
-                        <FormControl sx={{ m: 1 }} variant="outlined">
-                            <InputLabel id="demo-simple-select-helper-label">
-                                作图类型
-                            </InputLabel>
-                            <Select
-                                labelId="demo-simple-select-helper-label"
-                                id="demo-simple-select-helper"
-                                value={exporto}
-                                label="exporto"
-                                onChange={handleChangeCate}
-                            >
-                                {/* <MenuItem value="">
-            <em>None</em>
-        </MenuItem> */}
-                                <MenuItem value={10}>垂直剖面法</MenuItem>
-                                <MenuItem value={20}>垂线法</MenuItem>
-                            </Select>
-                        </FormControl>
-                        <FormControl sx={{ m: 1 }} variant="outlined">
-                            <InputLabel id="demo-simple-select-helper-label">
-                                保护等级
-                            </InputLabel>
-                            <Select
-                                labelId="demo-simple-select-helper-label"
-                                id="demo-simple-select-helper"
-                                value={exporto}
-                                label="exporto"
-                                onChange={handleChangeProtect}
-                            >
-                                {/* <MenuItem value="">
-            <em>None</em>
-        </MenuItem> */}
-                                <MenuItem value={10}>I级</MenuItem>
-                                <MenuItem value={20}>II级</MenuItem>
-                                <MenuItem value={30}>III级</MenuItem>
-                                <MenuItem value={40}>IV级</MenuItem>
-                            </Select>
-                        </FormControl>
                         <Button
                             className="click-btn"
                             onClick={() => {
@@ -132,7 +83,15 @@ function dxf() {
                             variant="contained"
                             size="large"
                         >
-                            导入配置
+                            导入配置文件
+                        </Button>
+                        <Button
+                            className="click-btn manual-btn"
+                            onClick={handleOpenModal}
+                            variant="contained"
+                            size="large"
+                        >
+                            手动输入配置
                         </Button>
 
                         <React.Fragment>
@@ -217,20 +176,12 @@ function dxf() {
                             </Popper>
                         </React.Fragment>
                     </div>
-
-                    <Button
-                        className="click-btn manual-btn"
-                        onClick={() => {
-                            alert("clicked");
-                        }}
-                        variant="contained"
-                        size="large"
-                        color="success"
-                    >
-                        手动输入
-                    </Button>
+                    <DataModal
+                        openModal={openModal}
+                        handleCloseModal={handleCloseModal}
+                    />
                 </Grid>
-                <Grid xs={8} md={9} className="right-wrap">
+                <Grid md={9} lg={10} className="right-wrap">
                     {/* dxf-viewer */}
                     <div id="cad-view"></div>
                 </Grid>
@@ -276,5 +227,3 @@ function dxf() {
         </Box>
     );
 }
-
-export default dxf;

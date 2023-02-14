@@ -60,8 +60,8 @@
 }
 
 .click-btn.manual-btn {
-    min-width: 80% !important;
-    margin-top: 30px !important;
+    min-width: 90% !important;
+    /* margin-top: 30px !important; */
 }
 
 .css-zqcytf-MuiButtonGroup-root .MuiButtonGroup-grouped:not(:last-of-type) {

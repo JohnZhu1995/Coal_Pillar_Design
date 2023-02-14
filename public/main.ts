@@ -9,11 +9,12 @@ const path = require("path");
 function createWindow() {
     // Create the browser window.
     let mainWindow = new BrowserWindow({
-        width: 800, // 窗口宽度
-        height: 600, // 窗口高度
-        minWidth: 800, // 窗口宽度
-        minHeight: 600, // 窗口高度
-        // title: "Electron app", // 窗口标题,如果由loadURL()加载的HTML文件中含有标签<title>，该属性可忽略
+        width: 1140, // 窗口宽度
+        height: 710, // 窗口高度
+        minWidth: 1140, // 窗口宽度
+        minHeight: 710, // 窗口高度
+        autoHideMenuBar: true,
+        title: "保护煤柱留设", // 窗口标题,如果由loadURL()加载的HTML文件中含有标签<title>，该属性可忽略
         icon: nativeImage.createFromPath("public/favicon.ico"), // "string" || nativeImage.createFromPath('public/favicon.ico')从位于 path 的文件创建新的 NativeImage 实例
         // resizable: false,
         webPreferences: {
@@ -53,7 +54,7 @@ function createWindow() {
     mainWindow.webContents.openDevTools();
 }
 
-app.allowRendererProcessReuse = true;
+// app.allowRendererProcessReuse = true;
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
