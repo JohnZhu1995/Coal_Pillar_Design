@@ -1,43 +1,134 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import * as React from "react";
+import { useRef } from "react";
 import "./dxf.css";
 import Box from "@mui/material/Box";
-import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import MenuItem from "@mui/material/MenuItem";
+// import TextField from "@mui/material/TextField";
+// import MenuItem from "@mui/material/MenuItem";
 // import FormHelperText from "@mui/material/FormHelperText";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
-import ButtonGroup from "@mui/material/ButtonGroup";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import ClickAwayListener from "@mui/material/ClickAwayListener";
-import Grow from "@mui/material/Grow";
-import Paper from "@mui/material/Paper";
-import Popper from "@mui/material/Popper";
-import MenuList from "@mui/material/MenuList";
-import Grid from "@mui/material/Unstable_Grid2";
+// import Select, { SelectChangeEvent } from "@mui/material/Select";
+// import ButtonGroup from "@mui/material/ButtonGroup";
+// import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+// import ClickAwayListener from "@mui/material/ClickAwayListener";
+// import Grow from "@mui/material/Grow";
+// import Paper from "@mui/material/Paper";
+// import Popper from "@mui/material/Popper";
+// import MenuList from "@mui/material/MenuList";
 // import ThreeDxf from "three-dxf";
+import Grid from "@mui/material/Unstable_Grid2";
 import DataModal from "./dataModal";
-
-// var parser = new window.DxfParser();
-// var dxf = parser.parseSync(fileReader.result);
-// cadCanvas = new ThreeDxf.Viewer(
-//     dxf,
-//     document.getElementById("cad-view"),
-//     400,
-//     400
-// );
-
-const options = ["导出数据配置", "导出dxf"];
+import { DxfParser } from "dxf-parser";
+import * as THREE from "three";
+import helvetikerFont from "./helvetiker_regular.typeface.json";
+import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
+const ThreeDxf = require("three-dxf");
 
 export default function dxf() {
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleFileSelect = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        // progress.style.width = "0%";
+        // progress.textContent = "0%";
+
+        const file: File | undefined = event.target.files?.[0];
+        const output: string[] = [];
+        if (file) {
+            output.push(
+                "<li><strong>",
+                encodeURI(file.name),
+                "</strong> (",
+                file.type || "n/a",
+                ") - ",
+                file.size.toString(),
+                " bytes, last modified: ",
+                file.lastModified
+                    ? new Date(file.lastModified).toLocaleDateString()
+                    : "n/a",
+                "</li>"
+            );
+        }
+
+        const fileDescription = document.getElementById("file-description");
+        if (fileDescription) {
+            fileDescription.innerHTML = `<ul>${output.join("")}</ul>`;
+        }
+
+        // $progress.classList.add("loading");
+        if (file) {
+            const reader = new FileReader();
+            reader.onprogress = updateProgress;
+            reader.onloadend = onSuccess;
+            // reader.onabort = abortUpload;
+            // reader.onerror = errorHandler;
+            reader.readAsArrayBuffer(file);
+        }
+    };
+
+    const updateProgress = (evt: ProgressEvent<FileReader>) => {
+        console.log("updateProgress()");
+
+        const loadingPersentage: number = Math.round(
+            (evt.loaded / evt.total!) * 100
+        );
+        console.log("loadingPersentage: ", loadingPersentage);
+        if (evt.lengthComputable) {
+            const percentLoaded = Math.round((evt.loaded / evt.total!) * 100);
+            if (percentLoaded < 100) {
+                // progress.style.width = percentLoaded + "%";
+                // progress.textContent = percentLoaded + "%";
+            }
+        }
+    };
+
+    // eslint-disable-next-line consistent-return
+    const onSuccess = (evt: ProgressEvent<FileReader>) => {
+        const fileReader = evt.target as FileReader;
+        const fileContent: ArrayBuffer | null =
+            fileReader.result as ArrayBuffer | null;
+        if (fileReader.error) return console.log("error onloadend!?");
+        // progress.style.width = "100%";
+        // progress.textContent = "100%";
+        setTimeout(function () {
+            // $progress.classList.remove("loading");
+        }, 2000);
+        if (fileContent) {
+            const parser = new DxfParser();
+            const decoder = new TextDecoder();
+            const dxfString = decoder.decode(fileContent);
+            const dxfcontent = parser.parseSync(dxfString);
+
+            const fontDataString = JSON.stringify(helvetikerFont);
+            const blob = new Blob([fontDataString], {
+                type: "application/json",
+            });
+            const fontUrl = URL.createObjectURL(blob);
+
+            let font: any;
+            let cadCanvas;
+            const loader = new FontLoader();
+            loader.load(fontUrl, function (response: any) {
+                font = response;
+                console.log("onSuccess()-loader", ThreeDxf);
+                cadCanvas = new ThreeDxf.Viewer(
+                    dxfcontent,
+                    document.getElementById("cad-view"),
+                    1000,
+                    800,
+                    font
+                );
+            });
+        }
+    };
+
     // ButtonGroup
     const [open, setOpen] = React.useState(false);
     const anchorRef = React.useRef<HTMLDivElement>(null);
     const [selectedIndex, setSelectedIndex] = React.useState(1);
-
-    const handleClick = () => {
-        console.info(`You clicked ${options[selectedIndex]}`);
-    };
 
     const handleMenuItemClick = (
         event: React.MouseEvent<HTMLLIElement, MouseEvent>,
@@ -48,7 +139,7 @@ export default function dxf() {
     };
 
     const handleToggle = () => {
-        setOpen((prevOpen) => !prevOpen);
+        setOpen((prevOpen: any) => !prevOpen);
     };
 
     const handleClose = (event: Event) => {
@@ -61,7 +152,6 @@ export default function dxf() {
 
         setOpen(false);
     };
-
     // Modal
     const [openModal, setOpenModal] = React.useState(false);
     const handleOpenModal = () => setOpenModal(true);
@@ -77,9 +167,21 @@ export default function dxf() {
                     <div className="auto-panel">
                         <Button
                             className="click-btn"
-                            onClick={() => {
-                                alert("clicked");
-                            }}
+                            onClick={handleFileSelect}
+                            variant="contained"
+                            size="large"
+                        >
+                            查看DXF文件
+                        </Button>
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            style={{ display: "none" }}
+                            onChange={handleFileChange}
+                        />
+                        <Button
+                            className="click-btn manual-btn"
+                            onClick={handleOpenModal}
                             variant="contained"
                             size="large"
                         >
@@ -93,88 +195,22 @@ export default function dxf() {
                         >
                             手动输入配置
                         </Button>
-
-                        <React.Fragment>
-                            <ButtonGroup
-                                variant="contained"
-                                ref={anchorRef}
-                                aria-label="split button"
-                            >
-                                <Button onClick={handleClick}>
-                                    {options[selectedIndex]}
-                                </Button>
-                                <Button
-                                    size="small"
-                                    aria-controls={
-                                        open ? "split-button-menu" : undefined
-                                    }
-                                    aria-expanded={open ? "true" : undefined}
-                                    aria-label="select merge strategy"
-                                    aria-haspopup="menu"
-                                    onClick={handleToggle}
-                                >
-                                    <ArrowDropDownIcon />
-                                </Button>
-                            </ButtonGroup>
-                            <Popper
-                                sx={{
-                                    zIndex: 1,
-                                }}
-                                open={open}
-                                anchorEl={anchorRef.current}
-                                role={undefined}
-                                transition
-                                disablePortal
-                            >
-                                {({ TransitionProps, placement }) => (
-                                    <Grow
-                                        {...TransitionProps}
-                                        style={{
-                                            transformOrigin:
-                                                placement === "bottom"
-                                                    ? "center top"
-                                                    : "center bottom",
-                                        }}
-                                    >
-                                        <Paper>
-                                            <ClickAwayListener
-                                                onClickAway={handleClose}
-                                            >
-                                                <MenuList
-                                                    id="split-button-menu"
-                                                    autoFocusItem
-                                                >
-                                                    {options.map(
-                                                        (option, index) => (
-                                                            <MenuItem
-                                                                key={option}
-                                                                disabled={
-                                                                    index === 2
-                                                                }
-                                                                selected={
-                                                                    index ===
-                                                                    selectedIndex
-                                                                }
-                                                                onClick={(
-                                                                    event
-                                                                ) =>
-                                                                    handleMenuItemClick(
-                                                                        event,
-                                                                        index
-                                                                    )
-                                                                }
-                                                            >
-                                                                {option}
-                                                            </MenuItem>
-                                                        )
-                                                    )}
-                                                </MenuList>
-                                            </ClickAwayListener>
-                                        </Paper>
-                                    </Grow>
-                                )}
-                            </Popper>
-                        </React.Fragment>
+                        <Button
+                            className="click-btn manual-btn"
+                            onClick={handleOpenModal}
+                            variant="contained"
+                            size="large"
+                        >
+                            导出配置文件
+                        </Button>
+                        <Button
+                            className="click-btn manual-btn"
+                            onClick={handleOpenModal}
+                            variant="contained"
+                            size="large"
+                        >
+                            保存DXF文件
+                        </Button>
                     </div>
                     <DataModal
                         openModal={openModal}
@@ -183,47 +219,10 @@ export default function dxf() {
                 </Grid>
                 <Grid md={9} lg={10} className="right-wrap">
                     {/* dxf-viewer */}
-                    <div id="cad-view"></div>
+                    <div id="file-description" className="help-block" />
+                    <div id="cad-view" />
                 </Grid>
             </Grid>
-            {/* <div className="left-wrap"></div>
-            <div className="right-wrap"></div> */}
-            {/* <div className="manual-panel" >
-    <Box
-        component="form"
-        sx={{
-            "& > :not(style)": { m: 1, width: "25ch" },
-        }}
-        noValidate
-        autoComplete="off"
-    >
-        <TextField
-            id="x-axis"
-            label="横轴x"
-            variant="outlined"
-        />
-        <TextField
-            id="y-axis"
-            label="竖轴y"
-            variant="outlined"
-        />
-        <TextField
-            id="radius"
-            label="半径"
-            variant="outlined"
-        />
-    </Box>
-    <Button
-        className="click-btn"
-        onClick={() => {
-            alert("clicked");
-        }}
-        variant="contained"
-        size="large"
-    >
-        作图
-    </Button>
-</div> */}
         </Box>
     );
 }
