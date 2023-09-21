@@ -24,6 +24,7 @@ import helvetikerFont from "./helvetiker_regular.typeface.json";
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
 const ThreeDxf = require("three-dxf");
 
+
 export default function dxf() {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -88,12 +89,12 @@ export default function dxf() {
     // eslint-disable-next-line consistent-return
     const onSuccess = (evt: ProgressEvent<FileReader>) => {
         const fileReader = evt.target as FileReader;
-        const fileContent: ArrayBuffer | null =
-            fileReader.result as ArrayBuffer | null;
+
+        const fileContent: ArrayBuffer | null = fileReader.result as ArrayBuffer | null;
         if (fileReader.error) return console.log("error onloadend!?");
         // progress.style.width = "100%";
         // progress.textContent = "100%";
-        setTimeout(function () {
+        setTimeout(function() {
             // $progress.classList.remove("loading");
         }, 2000);
         if (fileContent) {
@@ -111,7 +112,8 @@ export default function dxf() {
             let font: any;
             let cadCanvas;
             const loader = new FontLoader();
-            loader.load(fontUrl, function (response: any) {
+
+            loader.load(fontUrl, function(response: any) {
                 font = response;
                 console.log("onSuccess()-loader", ThreeDxf);
                 cadCanvas = new ThreeDxf.Viewer(
